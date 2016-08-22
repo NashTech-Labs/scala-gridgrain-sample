@@ -9,7 +9,8 @@ resolvers += "GridGain External Repository" at "http://www.gridgainsystems.com/n
 libraryDependencies ++= Seq(
   "org.gridgain" % "gridgain-core" % "7.6.4",
   "org.apache.ignite" % "ignite-indexing" % "1.6.4",
-  "org.apache.ignite" % "ignite-spring" % "1.6.4"
+  "org.apache.ignite" % "ignite-spring" % "1.6.4",
+  "mysql" % "mysql-connector-java" % "5.1.6"
 )
 
 

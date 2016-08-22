@@ -30,9 +30,16 @@
         http://www.springframework.org/schema/util/spring-util.xsd">
 
     <!-- Datasource for sample in-memory H2 database. -->
-    <bean id="h2-example-db" class="org.h2.jdbcx.JdbcDataSource">
-        <property name="URL" value="jdbc:h2:tcp://localhost/mem:ExampleDb" />
-        <property name="user" value="sa" />
+<!--    <bean id="h2-example-db" class="org.h2.jdbcx.JdbcDataSource">
+        <property name="URL" value="jdbc:h2:tcp://localhost/mem:ExampleDb"/>
+        <property name="user" value="sa"/>
+    </bean>-->
+
+    <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/mysql"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="toor"></property>
     </bean>
 
     <bean abstract="true" id="ignite.cfg" class="org.apache.ignite.configuration.IgniteConfiguration">
@@ -68,7 +75,7 @@
                     -->
                     <!-- Uncomment static IP finder to enable static-based discovery of initial nodes. -->
                     <bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder">
-                    <!--<bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.multicast.TcpDiscoveryMulticastIpFinder">-->
+                        <!--<bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.multicast.TcpDiscoveryMulticastIpFinder">-->
                         <property name="addresses">
                             <list>
                                 <!-- In distributed environment, replace with actual host IP address. -->
@@ -78,6 +85,37 @@
                     </bean>
                 </property>
             </bean>
+        </property>
+        <property name="cacheConfiguration">
+            <list>
+                <bean class="org.apache.ignite.configuration.CacheConfiguration">
+                    <property name="name" value="personCache"></property>
+                    <!-- Enable readThrough-->
+                    <property name="readThrough" value="true"></property>
+                    <property name="writeThrough" value="true"></property>
+                    <!-- Set cacheStoreFactory-->
+                    <property name="cacheStoreFactory">
+                        <bean class="javax.cache.configuration.FactoryBuilder" factory-method="factoryOf">
+                            <constructor-arg value="com.knoldus.TripleStore"></constructor-arg>
+                        </bean>
+                    </property>
+                    <property name="queryEntities">
+                        <list>
+                            <bean class="org.apache.ignite.cache.QueryEntity">
+                                <property name="keyType" value="java.lang.Long"></property>
+                                <property name="valueType" value="com.knoldus.Triple"></property>
+                                <property name="fields">
+                                    <map>
+                                        <entry key="entity" value="java.lang.String"></entry>
+                                        <entry key="pred1" value="java.lang.String"></entry>
+                                        <entry key="val1" value="java.lang.String"></entry>
+                                    </map>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+            </list>
         </property>
     </bean>
 </beans>
