@@ -1,3 +1,4 @@
+/*
 package com.knoldus
 
 import java.util
@@ -33,3 +34,4 @@ object StarterApplication extends App {
     ignite.close()
   }
 }
+*/
