@@ -1,15 +1,17 @@
 import java.util
 
 import org.apache.ignite.lang.IgniteCallable
-import org.apache.ignite.Ignition
+import org.apache.ignite.{Ignite, Ignition}
+
 import scala.collection.JavaConversions._
 
 object StarterApplication extends App {
-  try {
-    // Ignition.setClientMode(true)
-    val ignite = Ignition.start("src/main/resources/example-ignite.xml")
-    val calls = new util.ArrayList[IgniteCallable[Int]]()
+  var ignite: Ignite = _
 
+  try {
+    ignite = Ignition.start("src/main/resources/example-ignite.xml")
+
+    val calls = new util.ArrayList[IgniteCallable[Int]]()
     for (word <- "Count characters using callable".split(" ")) {
       calls.add(new IgniteCallable[Int] {
         override def call(): Int = word.length
@@ -25,5 +27,7 @@ object StarterApplication extends App {
     println("Total number of characters is '" + sum + "'.")
   } catch {
     case exception: Exception => exception.printStackTrace()
+  } finally {
+    ignite.close()
   }
 }
