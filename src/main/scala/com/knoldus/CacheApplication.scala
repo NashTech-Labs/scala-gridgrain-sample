@@ -23,44 +23,59 @@ object CacheApplication extends App {
   Ignition.setClientMode(true)
   val gridCfg = new GridGainConfiguration().setRollingUpdatesEnabled(true)
   val ignite = Ignition.start("src/main/resources/example-ignite.xml")
-  val cache = ignite.getOrCreateCache("tripleCache")
+  val cache = ignite.getOrCreateCache("departmentCache")
   cache.loadCache(null)
   val cursor = cache.query(new SqlFieldsQuery(
-    "select entity, pred1, val1 from Triple;"))
+    "select deptId, deptname, clientId from Department;"))
   println(cursor.getAll())
 }
 
-class TripleStore extends CacheStoreAdapter[Long, Triple] with CacheStore[Long, Triple]{
+object CacheApplication2 extends App {
+
+  Ignition.setClientMode(true)
+  val gridCfg = new GridGainConfiguration().setRollingUpdatesEnabled(true)
+  val ignite = Ignition.start("src/main/resources/example2-ignite.xml")
+  val cache = ignite.getOrCreateCache("employeeCache")
+  cache.loadCache(null)
+  val cursor2=cache.query(new SqlFieldsQuery(
+    "select empId, deptId, empName, clientId from Employee;"))
+  println(cursor2.getAll())
+}
+
+case class Department(deptId: Int, deptName: String, clientId: String)
+
+
+class DepartmentStore extends CacheStoreAdapter[Int, Department] with CacheStore[Int, Department] {
 
   @SpringResource(resourceName = "dataSource")
   private var dataSource: DataSource = _
 
-  override def loadCache(clo: IgniteBiInClosure[Long, Triple], @Nullable objects: Object*): Unit = {
+  override def loadCache(clo: IgniteBiInClosure[Int, Department], @Nullable objects: Object*): Unit = {
 
     println(">> Loading cache from store...")
 
     val conn = dataSource.getConnection()
 
-    val st = conn.prepareStatement("select * from dph")
+    val st = conn.prepareStatement("select * from Department")
     val rs: ResultSet = st.executeQuery()
 
     while (rs.next()) {
 
-      val triple = Triple(rs.getString(1), rs.getString(3), rs.getString(4))
+      val triple = Department(rs.getInt(1), rs.getString(2), rs.getString(3))
       println("Triple here is :::::", triple)
-      clo.apply(rs.getInt(9).toLong, triple)
+      clo.apply(rs.getInt(1), triple)
 
     }
   }
 
-  override def load(key: Long): Triple = {
+  override def load(key: Int): Department = {
     println(">> Loading triple from store...")
 
     val conn = dataSource.getConnection()
-    val st = conn.prepareStatement("select * from dph where id = ?")
-    st.setLong(1, key)
+    val st = conn.prepareStatement("select * from Department where deptId = ?")
+    st.setInt(1, key)
     val rs = st.executeQuery()
-    val ss = if (rs.next()) Triple(rs.getString(1), rs.getString(2), rs.getString(3)) else null
+    val ss = if (rs.next()) Department(rs.getInt(1), rs.getString(2), rs.getString(3)) else null
     println("ss data in load :", ss)
     ss
   }
@@ -68,6 +83,6 @@ class TripleStore extends CacheStoreAdapter[Long, Triple] with CacheStore[Long, 
   override def delete(a: Object): Unit = {}
 
 
-  override def write(e: Cache.Entry[_ <: Long, _ <: Triple]): Unit = {}
+  override def write(e: Cache.Entry[_ <: Int, _ <: Department]): Unit = {}
 
 }

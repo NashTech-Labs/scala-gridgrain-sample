@@ -79,7 +79,7 @@
                         <property name="addresses">
                             <list>
                                 <!-- In distributed environment, replace with actual host IP address. -->
-                                <value>127.0.0.1:47500</value>
+                                <value>192.168.2.138:47500</value>
                             </list>
                         </property>
                     </bean>
@@ -89,26 +89,25 @@
         <property name="cacheConfiguration">
             <list>
                 <bean class="org.apache.ignite.configuration.CacheConfiguration">
-                    <property name="name" value="employeeCache"></property>
+                    <property name="name" value="departmentCache"></property>
                     <!-- Enable readThrough-->
                     <property name="readThrough" value="true"></property>
                     <property name="writeThrough" value="true"></property>
                     <!-- Set cacheStoreFactory-->
                     <property name="cacheStoreFactory">
                         <bean class="javax.cache.configuration.FactoryBuilder" factory-method="factoryOf">
-                            <constructor-arg value="com.knoldus.EmployeeStore"></constructor-arg>
+                            <constructor-arg value="com.knoldus.DepartmentStore"></constructor-arg>
                         </bean>
                     </property>
                     <property name="queryEntities">
                         <list>
                             <bean class="org.apache.ignite.cache.QueryEntity">
-                                <property name="keyType" value="java.lang.Int"></property>
-                                <property name="valueType" value="com.knoldus.Employee"></property>
+                                <property name="keyType" value="java.lang.Integer"></property>
+                                <property name="valueType" value="com.knoldus.Department"></property>
                                 <property name="fields">
                                     <map>
-                                        <entry key="empId" value="java.lang.Integer"></entry>
-                                        <entry key="empName" value="java.lang.String"></entry>
                                         <entry key="deptId" value="java.lang.Integer"></entry>
+                                        <entry key="deptName" value="java.lang.String"></entry>
                                         <entry key="clientId" value="java.lang.String"></entry>
                                     </map>
                                 </property>

@@ -25,6 +25,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
     <!-- Imports default Ignite configuration -->
-    <import resource="example2-default.xml"/>
+    <import resource="example-default.xml"/>
     <bean parent="ignite.cfg"/>
 </beans>
